@@ -3,9 +3,9 @@
 module.exports = {
 
     'facebookAuth' : {
-        'clientID'      : '369500033250382', // your App ID
-        'clientSecret'  : '4a3ca28934ab34509f55fb83d84941f5', // your App Secret
-        'callbackURL'   : 'http://localhost:8080/auth/facebook/callback'
+        'clientID'      : '387771258026865', // your App ID
+        'clientSecret'  : '049ec5d08108994008209057b2ef5be1', // your App Secret
+        'callbackURL'   : 'http://darrenx1.com:8080/auth/facebook/callback'
     },
     'microsoftAuth' : {
         'clientID'      : '0000000044144322', // your App ID

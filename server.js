@@ -16,27 +16,6 @@ var cookieParser = require('cookie-parser');// cookies needed for passport
 var session = require('express-session');   // session support needed for passport
 var port = process.env.PORT || 8080;        // set our port
 
-//cleanup users
-var _ = require('lodash');
-var repo = require('./app/modules/repository.js'); 
-var users = repo.getUsers();
-_.forEach(users, function(u, key) {
-  
-  var fName = u.name.first;
-  var lName = u.name.last;
-  var title = u.name.title;
-  
-  u["firstName"] = fName;
-  u["lastName"] = fName;
-  u["title"] = title;
-  
-  u.name = fName + ' ' + lName;
-  
-  console.log(u);
-  
-});
-
-
 // configuration variables
 app.set('superSecret', config.secret); // secret variable
 app.set('trustedservers', config.trustedservers);
@@ -52,11 +31,12 @@ app.use(cookieParser());    // read cookies (needed for auth)
 // setup express to server static content
 app.use(compression())
 app.use(express.static('www'));
-//app.set('views', __dirname  + '/www');
+app.set('views', __dirname  + '/www');
 
 app.set('view engine', 'ejs'); // set up ejs for templating
 
 // required for passport
+require('./app/modules/passport.js')(passport); // pass passport for configuration
 app.use(session({ secret: 'ilovescotchscotchyscotchscotch', resave: true,
     saveUninitialized: true })); // session secret
 app.use(passport.initialize());

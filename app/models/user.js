@@ -1,6 +1,7 @@
 "use strict";
 module.exports = {
     "gender": "unknown",
+    "name" : "",
     "firstname": "",
     "lastname": "",
     "title": "",
