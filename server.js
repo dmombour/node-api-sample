@@ -16,6 +16,27 @@ var cookieParser = require('cookie-parser');// cookies needed for passport
 var session = require('express-session');   // session support needed for passport
 var port = process.env.PORT || 8080;        // set our port
 
+//cleanup users
+var _ = require('lodash');
+var repo = require('./app/modules/repository.js'); 
+var users = repo.getUsers();
+_.forEach(users, function(u, key) {
+  
+  var fName = u.name.first;
+  var lName = u.name.last;
+  var title = u.name.title;
+  
+  u["firstName"] = fName;
+  u["lastName"] = fName;
+  u["title"] = title;
+  
+  u.name = fName + ' ' + lName;
+  
+  console.log(u);
+  
+});
+
+
 // configuration variables
 app.set('superSecret', config.secret); // secret variable
 app.set('trustedservers', config.trustedservers);

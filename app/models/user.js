@@ -17,7 +17,7 @@ module.exports = {
     "md5": "",
     "sha1": "",
     "sha256": "",
-    "registered": ,
+    "registered": false,
     "dob": 0,
     "phone": "",
     "cell": "",
