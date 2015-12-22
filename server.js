@@ -58,8 +58,7 @@ fs.readdirSync('./app/controllers').forEach(function(file) {
 
 var repo = require('./app/modules/repository.js');                   
 require('./app/controllers/authenticationController')(app, router, jwt);
-require('./app/controllers/meetController')(app, router);
-require('./app/controllers/sampleController')(app, router); 
+require('./app/controllers/todoController')(app, router); 
 require('./app/modules/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
 
@@ -80,6 +79,9 @@ express.response.created = function(item, location) {
 };
 express.response.badRequest = function(message) {
     return this.status(400).send(message);
+};
+express.response.notFound = function(message) {
+    return this.status(404).send(message);
 };
 
 // ROUTES FOR OUR API LOCATED IN /CONTROLLERS

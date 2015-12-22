@@ -1,9 +1,16 @@
 # Node-API Sample Application
 
 Setup
+Install the node modules (backend)
 $ npm install
+Install the bower modules (frontend)
+$ bower install
 
-Start -> use nodemon!
+Development (use nodemon)
+Nodemon - if not installed install globally
+$ npm install nodemon -g
+
+Run
 $ nodemon server.js
 
 # This sample application attempts to demonstrate the following
