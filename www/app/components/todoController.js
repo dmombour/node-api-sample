@@ -24,8 +24,7 @@ angular.module('todoController', [])
 				$scope.loading = true;
 
 				// call the create function from our service (returns a promise object)
-				todos.create($scope.formData)
-                
+				todos.create($scope.formData)                
 					// if successful creation, update scope
 					.success(function(data) {
 						$scope.loading = false;
@@ -44,6 +43,9 @@ angular.module('todoController', [])
 				// if successful creation, call our get function to get all the new todos
 				.success(function(data) {
 					$scope.loading = false;
+                    /* _.remove($scope.todos, function (item) {
+                        return (item.id == id);
+                    });*/
 					//$scope.todos = data; // assign our new list of todos
 				});
 		};

@@ -68,14 +68,12 @@ module.exports = function (app, router) {
                 res.badRequest('you must specify a valid body');
             }
             else {
-                
-                var id = parseInt(req.body.id);
-                var todo = new Todo(id, req.body.text);
-                var location = "/api/v1/todo/" + req.body.id.toString();
+               
+                var newItem = repo.addTodo(req.body.text);
+                var todo = new Todo(newItem.id, newItem.text);
+                var location = "/api/v1/todo/" + newItem.id.toString();
                 todo.addLink('self', location);
-
-                repo.addTodo(todo);
-
+                
                 res.created(todo, location);
             }
 

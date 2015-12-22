@@ -59,9 +59,14 @@ module.exports = {
             return match;
         }
     },
-    addTodo: function (item) {
-        todos.push(item);
-        return item;
+    addTodo: function (text) {
+        
+        var last = _.last(todos);
+        var newId = last.id + 1;
+        
+        var todo = { id: newId, text: text };
+        todos.push(todo);
+        return todo;
     },
     updateTodo: function (item) {
         
