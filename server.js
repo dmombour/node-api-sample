@@ -14,6 +14,8 @@ var flash    = require('connect-flash');    // needed for passport
 var cookieParser = require('cookie-parser');// cookies needed for passport
 var session = require('express-session');   // session support needed for passport
 var port = process.env.PORT || 8082;        // set our port
+var server = require('http').Server(app);   // our http server
+var io = require('socket.io')(server);      // socket.io for streaming events
 //var favicon = require('serve-favicon');   // change the favicon
 
 // GLOBAL APP VARIABLES
@@ -97,8 +99,17 @@ app.use('/api/v1', router);         // all of our routes will be prefixed with /
 router.get('/', function (req, res) {
     res.json({ message: 'success! welcome to our api!' });
 });
+io.on('connection', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+});
+
 
 // START THE SERVER
 // =============================================================================
-app.listen(port);
-console.log('Magic happens on port ' + port + ' please visit http://localhost:8082/api/v1');
+//app.listen(port);
+server.listen(port);
+
+console.log('Magic happens on port ' + port + ' please visit http://localhost:8082 or hit http://localhost:8082/api/v1/');

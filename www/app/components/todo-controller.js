@@ -1,20 +1,25 @@
 'use strict';
-appControllers.controller('todoController', ['$scope', '$http', '$routeParams', '$location', 'todoService',
-    function ($scope, $http, $routeParams, $location, todoSvc) {
+appControllers.controller('todoController', ['$scope', '$http', '$routeParams', '$location', 'socket', 'todoService',
+    function ($scope, $http, $routeParams, $location, socket, todoSvc) {
 
         $scope.formData = {};
         $scope.loading = true;
         $scope.selectedId = $routeParams.id;
         $scope.text;
 
+        socket.on('news', function (data) {
+            console.log('socket:', data);
+            socket.emit('my other event', { my: 'data' });
+        });
+
         console.log($routeParams.id);
         
         // GET =====================================================================
 		
         if ($scope.selectedId) {
-            
+
             console.log('get by id', $scope.selectedId);
-            
+
             todoSvc.getById($scope.selectedId)
                 .success(function (data) {
                     console.log(data);

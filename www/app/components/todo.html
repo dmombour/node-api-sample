@@ -24,16 +24,19 @@
                         </div>
                     </div>
                 </div>
+                <br>
+                <br>
+                
                 <!-- FORM TO CREATE -->
                 <div id="sample-form" class="row">
                     <form>
-                        <div class="col-sm-8">
+                        <div class="col-sm-10">
                             <div class="form-group">
                                 <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
-                                <input type="text" class="form-control input-lg text-center" placeholder="Add your todo here.." ng-model="formData.text">
+                                <input type="text" class="form-control text-center" placeholder="type here.." ng-model="formData.text">
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-2">
                             <button type="submit" class="btn btn-primary" ng-click="createTodo()">Add</button>
                         </div>
 
