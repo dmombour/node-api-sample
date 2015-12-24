@@ -8,9 +8,10 @@ var repo = require('../modules/repository.js');
 
 module.exports = function (app, router, jwt, configAuth) {
 
+    var superSecret = configAuth.jwtsecret;
+
     // route middleware to verify a token and ALLOW or DENY an http request 
     router.use(function (req, res, next) {
-
   
         // check header or url parameters or post parameters for token        
         var token = req.query.token || req.headers['authorization'];        
@@ -18,7 +19,7 @@ module.exports = function (app, router, jwt, configAuth) {
         if (token) {
             token = token.replace("Bearer ", "");        
             // verifies secret and checks exp
-            jwt.verify(token, app.get('superSecret'), function (err, decoded) {
+            jwt.verify(token, superSecret, function (err, decoded) {
                 if (err) {
                     return res.unauthorized('unauthorized. Failed to authenticate token. please login. The error was:' + err.message);
                 } else {
@@ -150,7 +151,7 @@ module.exports = function (app, router, jwt, configAuth) {
                         console.log('auth:password flow... found', match);      
                         
                         // create a token
-                        var token = jwt.sign(match, app.get('superSecret'), {
+                        var token = jwt.sign(match, superSecret, {
                             expiresIn: 86400 // expires in 24 hours
                         });    
                         
@@ -201,7 +202,7 @@ module.exports = function (app, router, jwt, configAuth) {
                                 console.log('auth:client_credentials flow. user found', user); 
                                 
                                 //found the user... let's use this.
-                                token = jwt.sign(user, app.get('superSecret'), {
+                                token = jwt.sign(user, superSecret, {
                                     expiresInMinutes: 1440 // expires in 24 hours                                    
                                 });
                             }
@@ -216,7 +217,7 @@ module.exports = function (app, router, jwt, configAuth) {
 
                                 console.log('auth:client_credentials flow. no user found. created', newUser);
 
-                                token = jwt.sign(newUser, app.get('superSecret'), {
+                                token = jwt.sign(newUser, superSecret, {
                                     expiresInMinutes: 1440 // expires in 24 hours                                    
                                 });
                             }
@@ -225,7 +226,7 @@ module.exports = function (app, router, jwt, configAuth) {
                             
                             // here ... we are not a user.. we are just a server. 
                             // give out a server token                        
-                            token = jwt.sign(match, app.get('superSecret'), {
+                            token = jwt.sign(match, superSecret, {
                                 expiresInMinutes: 1440 // expires in 24 hours                                    
                             });
                         }                           

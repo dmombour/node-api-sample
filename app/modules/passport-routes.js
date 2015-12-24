@@ -1,6 +1,8 @@
 "use strict";
-module.exports = function (app, passport, jwt) {
+module.exports = function (app, passport, jwt, configAuth) {
 
+    var superSecret = configAuth.jwtsecret;
+    
     // normal routes ===============================================================
 
     // show the home page (will also have our login links)
@@ -67,7 +69,7 @@ module.exports = function (app, passport, jwt) {
             // return the token or you would wish otherwise give eg. a succes message
             //res.render('json', { data: JSON.stringify(req.user.access_token) });
             // ok. we have our user. we need to create a jwt token and pass via query string.
-            var token = jwt.sign(req.user, app.get('superSecret'), {
+            var token = jwt.sign(req.user, superSecret, {
                 expiresIn: 86400 // expires in 24 hours
             });
             res.redirect('/#/login/' + token);
@@ -99,7 +101,7 @@ module.exports = function (app, passport, jwt) {
             // return the token or you would wish otherwise give eg. a succes message
             //res.render('json', { data: JSON.stringify(req.user.access_token) });
             // ok. we have our user. we need to create a jwt token and pass via query string.
-            var token = jwt.sign(req.user, app.get('superSecret'), {
+            var token = jwt.sign(req.user, superSecret, {
                 expiresIn: 86400 // expires in 24 hours
             });
             res.redirect('/#/login/' + token);
@@ -131,7 +133,7 @@ module.exports = function (app, passport, jwt) {
             // return the token or you would wish otherwise give eg. a succes message
             //res.render('json', { data: JSON.stringify(req.user.access_token) });
             // ok. we have our user. we need to create a jwt token and pass via query string.
-            var token = jwt.sign(req.user, app.get('superSecret'), {
+            var token = jwt.sign(req.user, superSecret, {
                 expiresIn: 86400 // expires in 24 hours
             });
             res.redirect('/#/login/' + token);
@@ -169,7 +171,7 @@ module.exports = function (app, passport, jwt) {
             // return the token or you would wish otherwise give eg. a succes message
             //res.render('json', { data: JSON.stringify(req.user.access_token) });
             // ok. we have our user. we need to create a jwt token and pass via query string.
-            var token = jwt.sign(req.user, app.get('superSecret'), {
+            var token = jwt.sign(req.user, superSecret, {
                 expiresIn: 86400 // expires in 24 hours
             });
             res.redirect('/#/login/' + token);

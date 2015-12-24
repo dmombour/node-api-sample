@@ -12,7 +12,7 @@ var repo = require('./repository.js');
 var User = require('../models/user.js');
 
 module.exports = function (passport, configAuth) {
-
+   
     // =========================================================================
     // passport session setup ==================================================
     // =========================================================================

@@ -20,7 +20,6 @@ var io = require('socket.io')(server);      // socket.io for streaming events
 
 // GLOBAL APP VARIABLES
 // =============================================================================
-app.set('superSecret', config.secret);
 app.set('openroutes', config.openroutes);
 app.set('pagesize', config.pagesize);
 
@@ -70,7 +69,7 @@ fs.readdirSync('./app/controllers').forEach(function(file) {
 
 // modules
 var repo = require('./app/modules/repository.js');   
-require('./app/modules/passport-routes.js')(app, passport, jwt); // load our routes and pass in our app and fully configured passport
+require('./app/modules/passport-routes.js')(app, passport, jwt, configAuth); // load our routes and pass in our app and fully configured passport
 // controllers
 require('./app/controllers/auth.js')(app, router, jwt, configAuth);
 require('./app/controllers/todo.js')(app, router); 
