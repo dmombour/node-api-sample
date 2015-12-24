@@ -11,10 +11,7 @@ var repo = require('./repository.js');
 // load up the user model
 var User = require('../models/user.js');
 
-// load the auth variables
-var configAuth = require('../../config/auth.js'); // use this one for testing
-
-module.exports = function (passport) {
+module.exports = function (passport, configAuth) {
 
     // =========================================================================
     // passport session setup ==================================================

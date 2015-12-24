@@ -6,7 +6,7 @@ var repo = require('../modules/repository.js');
 // Auth controller. Used to protect resources in this application and obtain a bearer token
 // =========================================================================
 
-module.exports = function (app, router, jwt) {
+module.exports = function (app, router, jwt, configAuth) {
 
     // route middleware to verify a token and ALLOW or DENY an http request 
     router.use(function (req, res, next) {
@@ -127,7 +127,7 @@ module.exports = function (app, router, jwt) {
 
         .post(function (req, res) {
 
-            var trustedservers = app.get('trustedservers');
+            var trustedservers = configAuth.trustedServers;
 
             switch (req.body.grant_type) {
                 case 'password':

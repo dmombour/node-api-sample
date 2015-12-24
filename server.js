@@ -21,7 +21,6 @@ var io = require('socket.io')(server);      // socket.io for streaming events
 // GLOBAL APP VARIABLES
 // =============================================================================
 app.set('superSecret', config.secret);
-app.set('trustedservers', config.trustedservers);
 app.set('openroutes', config.openroutes);
 app.set('pagesize', config.pagesize);
 
@@ -39,7 +38,19 @@ app.set('view engine', 'ejs'); // set up ejs for templating
 
 // PASSPORT SETUP - the auth library
 // =============================================================================
-require('./app/modules/passport.js')(passport); // pass passport for configuration
+
+var configAuth;
+try {
+    configAuth = require('./config/authkeys.js'); 
+} catch (error) {
+    console.warn("WARNING>>>WARNING>>>WARNING>>>WARNING>>> NO authkeys.js");
+    console.warn("You must program your own authkeys.js file. Copy ./config/authkeys-template.js and enter your keys");
+    console.warn("Loading authkeys-template.js instead");
+    configAuth = require('./config/authkeys-template.js');
+}
+
+
+require('./app/modules/passport.js')(passport, configAuth); // pass passport for configuration
 app.use(session({ secret: 'ilovescotchscotchyscotchscotch', resave: true, saveUninitialized: true })); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
@@ -61,7 +72,7 @@ fs.readdirSync('./app/controllers').forEach(function(file) {
 var repo = require('./app/modules/repository.js');   
 require('./app/modules/passport-routes.js')(app, passport, jwt); // load our routes and pass in our app and fully configured passport
 // controllers
-require('./app/controllers/auth.js')(app, router, jwt);
+require('./app/controllers/auth.js')(app, router, jwt, configAuth);
 require('./app/controllers/todo.js')(app, router); 
 
 
