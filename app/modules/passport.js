@@ -28,14 +28,14 @@ module.exports = function (passport) {
 
     // used to deserialize the user
     passport.deserializeUser(function (id, done) {
-        
-         var user = repo.getUserById(id);
-                    if (user) {
-                        done(null, user); // user found, return that user                        
-                    }
-                    else {
-                        done('no user matched in repo');
-                    }
+
+        var user = repo.getUserById(id);
+        if (user) {
+            done(null, user); // user found, return that user                        
+        }
+        else {
+            done('no user matched in repo');
+        }
         
         
         /*User.findById(id, function (err, user) {
@@ -161,8 +161,8 @@ module.exports = function (passport) {
         clientSecret: configAuth.facebookAuth.clientSecret,
         callbackURL: configAuth.facebookAuth.callbackURL,
         profileFields: ['id', 'name', 'email'],
-        passReqToCallback: true // allows us to pass in the req from our route (lets us check if a user is logged in or not)
-
+        passReqToCallback: false, // allows us to pass in the req from our route (lets us check if a user is logged in or not)
+        enableProof: true
     },
         function (req, token, refreshToken, profile, done) {
 
@@ -174,7 +174,7 @@ module.exports = function (passport) {
 
                     // find matching user
                     var userId = _.first(_.pluck(profile.emails, 'value'));
-                    
+
                     var user = repo.getUserById(userId);
                     if (user) {
                         return done(null, user); // user found, return that user                        
@@ -225,19 +225,30 @@ module.exports = function (passport) {
 
                 } else {
                     // user already exists and is logged in, we have to link accounts
-                    var user = req.user; // pull the user out of the session
+                    // find matching user
+                    var userId = _.first(_.pluck(profile.emails, 'value'));
 
-                    user.facebook.id = profile.id;
-                    user.facebook.token = token;
-                    user.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
-                    user.facebook.email = (profile.emails[0].value || '').toLowerCase();
-
-                    user.save(function (err) {
-                        if (err)
-                            return done(err);
-
-                        return done(null, user);
-                    });
+                    var user = repo.getUserById(userId);
+                    if (user) {
+                        return done(null, user); // user found, return that user                        
+                    }
+                    else {
+                        return done('no user matched in repo');
+                    }
+                    
+                    /* var user = req.user; // pull the user out of the session
+ 
+                     user.facebook.id = profile.id;
+                     user.facebook.token = token;
+                     user.facebook.name = profile.name.givenName + ' ' + profile.name.familyName;
+                     user.facebook.email = (profile.emails[0].value || '').toLowerCase();
+ 
+                     user.save(function (err) {
+                         if (err)
+                             return done(err);
+ 
+                         return done(null, user);
+                     });*/
 
                 }
             });

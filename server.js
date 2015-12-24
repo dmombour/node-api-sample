@@ -14,7 +14,8 @@ var passport = require('passport');
 var flash    = require('connect-flash');
 var cookieParser = require('cookie-parser');// cookies needed for passport
 var session = require('express-session');   // session support needed for passport
-var port = process.env.PORT || 8080;        // set our port
+var port = process.env.PORT || 8082;        // set our port
+//var favicon = require('serve-favicon');
 
 // configuration variables
 app.set('superSecret', config.secret); // secret variable
@@ -32,6 +33,7 @@ app.use(cookieParser());    // read cookies (needed for auth)
 app.use(compression())
 app.use(express.static('www'));
 app.set('views', __dirname  + '/www');
+//app.use(favicon(__dirname + '/www/assets/favicon.ico'));
 
 app.set('view engine', 'ejs'); // set up ejs for templating
 
@@ -59,13 +61,11 @@ fs.readdirSync('./app/controllers').forEach(function(file) {
 var repo = require('./app/modules/repository.js');                   
 require('./app/controllers/authenticationController')(app, router, jwt);
 require('./app/controllers/todoController')(app, router); 
-require('./app/modules/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
+require('./app/modules/passport-routes.js')(app, passport, jwt); // load our routes and pass in our app and fully configured passport
 
 
 // middleware to use for all requests
 router.use(function (req, res, next) {
-    // do logging
-    //console.log('', req);
     next(); // make sure we go to the next routes and don't stop here
 });
 
@@ -83,6 +83,12 @@ express.response.badRequest = function(message) {
 express.response.notFound = function(message) {
     return this.status(404).send(message);
 };
+express.response.unauthorized = function(message) {
+    return this.status(401).send(message);
+};
+express.response.forbidden = function(message) {
+    return this.status(403).send(message);
+};
 
 // ROUTES FOR OUR API LOCATED IN /CONTROLLERS
 // =============================================================================
@@ -91,7 +97,7 @@ express.response.notFound = function(message) {
 // all of our routes will be prefixed with /api
 app.use('/api/v1', router);
 
-// test route to make sure everything is working (accessed at GET http://localhost:8080/api/v1)
+// test route to make sure everything is working (accessed at GET http://localhost:8082/api/v1)
 router.get('/', function (req, res) {
     res.json({ message: 'success! welcome to our api!' });
 });
@@ -100,4 +106,4 @@ router.get('/', function (req, res) {
 // START THE SERVER
 // =============================================================================
 app.listen(port);
-console.log('Magic happens on port ' + port + ' please visit http://localhost:8080/api/v1');
+console.log('Magic happens on port ' + port + ' please visit http://localhost:8082/api/v1');

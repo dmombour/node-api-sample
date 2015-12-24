@@ -20,7 +20,9 @@ module.exports = function (app, router, jwt) {
             // verifies secret and checks exp
             jwt.verify(token, app.get('superSecret'), function (err, decoded) {
                 if (err) {
-                    return res.json({ success: false, message: 'Failed to authenticate token.' });
+
+                    return res.unauthorized('unauthorized. Failed to authenticate token. please login');
+
                 } else {
                     // if everything is good, save to request for use in other routes
                     req.decoded = decoded;
@@ -46,7 +48,7 @@ module.exports = function (app, router, jwt) {
             else {
                 console.log('auth:insecure route match. DENIED');
                 // return an error
-                return res.status(403).send('Unauthorized');
+                return res.unauthorized('unauthorized. please login');
             }
         }
     });
@@ -64,8 +66,7 @@ module.exports = function (app, router, jwt) {
 
             }
             else {
-
-                res.json({ message: 'unknown' });
+                res.unauthorized();
             }
 
         })
@@ -93,9 +94,10 @@ module.exports = function (app, router, jwt) {
 
                     if (match != undefined) {
                         console.log('auth:password flow... found', match);      
+                        
                         // create a token
                         var token = jwt.sign(match, app.get('superSecret'), {
-                            expiresInMinutes: 1440 // expires in 24 hours
+                            expiresIn: 86400 // expires in 24 hours
                         });    
                         
                         // return the information including token as JSON
