@@ -3,12 +3,14 @@
 
         <h1><span class="fa fa-sticky-note"></span> Todo</h1>
 
-                <form>
-                    <div class="form-group">
-                        <label>Text</label>
-                        <input type="text" class="form-control" name="text" ng-model="text">
-                    </div>
-                    <button type="submit" class="btn btn-warning btn-lg" ng-click="save(text)">Save</button>
-                </form>
+        <form>
+            <div class="form-group">
+                <label>Text</label>
+                <input type="text" class="form-control" name="text" ng-model="text">
+            </div>
+            <button type="submit" class="btn btn-warning" ng-click="saveTodo(text)">Save</button>
+            <a href="#/todo"><button type="submit" class="btn btn-primary"">Back</button></a>
+        </form>
     </div>
+    
 </div>

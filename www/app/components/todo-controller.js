@@ -6,6 +6,7 @@ appControllers.controller('todoController', ['$scope', '$http', '$routeParams', 
         $scope.loading = true;
         $scope.selectedId = $routeParams.id;
         $scope.text;
+        $scope.todos;
 
         socket.on('news', function (data) {
             console.log('socket:', data);
@@ -29,9 +30,11 @@ appControllers.controller('todoController', ['$scope', '$http', '$routeParams', 
         else {
             // when landing on the page, get all and show them
             // use the service to get all 
+            $scope.loading = true;
+
             todoSvc.get()
                 .success(function (data) {
-                    $scope.todos = data.items;
+                    $scope.todos = data;
                     $scope.loading = false;
                 });
         }
@@ -67,6 +70,10 @@ appControllers.controller('todoController', ['$scope', '$http', '$routeParams', 
             // if successful creation, call our get function to get all the new todos
                 .success(function (data) {
                     $scope.loading = false;
+                    _.remove($scope.todos, function (item) {
+                        return (item.id == id);
+                    });
+        
                     /* _.remove($scope.todos, function (item) {
                         return (item.id == id);
                     });*/
@@ -74,11 +81,32 @@ appControllers.controller('todoController', ['$scope', '$http', '$routeParams', 
                 });
         };
         
+        // SAVE ==================================================================
+        $scope.saveTodo = function (text) {
+            $scope.loading = true;
+            todoSvc.update($scope.selectedId, { text: text })
+            // if successful creation, call our get function to get all the new todos
+                .success(function (data) {
+                    $scope.loading = false;
+                    $location.path('#/todo');
+                });
+        };
+        
         // EDIT ==================================================================
-        // navigate
         $scope.editTodo = function (id) {
             $scope.loading = true;
             $location.path('#/todo/' + id);
+        };       
+
+        // MORE ==================================================================
+        $scope.next = function (qs) {
+            $scope.loading = true;
+
+            todoSvc.get(qs)
+                .success(function (data) {
+                    $scope.todos = data;
+                    $scope.loading = false;
+                });
         };
 
     }]);

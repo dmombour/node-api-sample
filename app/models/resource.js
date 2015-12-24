@@ -1,4 +1,8 @@
 "use strict";
+
+// RESOURCE - base class to represent a resource in the system with hypermedia
+// =========================================================================
+
 /*
 {
     "_links": {

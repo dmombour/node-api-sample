@@ -1,7 +1,7 @@
 <div class="container">
     <div class="col-sm-6 col-sm-offset-3">
 
-        <h1><span class="fa fa-sticky-note"></span> Todo... you have <span class="label label-info">{{ todos.length }}</span> todos </h1>
+        <h1><span class="fa fa-sticky-note"></span> Todo... showing <span class="label label-info">{{ todos.items.length }}</span> todos </h1>
 
         <!-- LIST -->
         <div id="todo-list" class="row">
@@ -12,7 +12,7 @@
                 </p>
 
                 <!-- LOOP OVER THE todos IN $scope.todos -->
-                <div class="checkbox" ng-repeat="todo in todos">
+                <div class="checkbox" ng-repeat="todo in todos.items">
 
                     <div class="row">
                         <div class="col-sm-8">
@@ -25,6 +25,12 @@
                     </div>
                 </div>
                 <br>
+                
+                <div class="row" ng-show="todos._links.next">
+                        <div class="col-sm-12">
+                             <button type="submit" class="btn btn-primary" ng-click="next(todos._links.next)">Next >></button>
+                        </div>
+                    </div>                    
                 <br>
                 
                 <!-- FORM TO CREATE -->

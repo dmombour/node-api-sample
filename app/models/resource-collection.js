@@ -1,4 +1,8 @@
 "use strict";
+
+// RESOURCE-COLLECTION - base class to represent a resource collection in the system with hypermedia
+// =========================================================================
+
 var Resource = require('./resource')
 var util = require('util');
 var _ = require('lodash');
@@ -55,7 +59,7 @@ function ResourceCollection() {
                 
             }
             
-            self.addLink('next', '/$skip=' + skip + '&$top=' + top);
+            self.addLink('next', '?$skip=' + skip + '&$top=' + top);
         }
     };
 

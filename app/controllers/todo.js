@@ -5,6 +5,9 @@ var Todo = require('../models/todo.js');
 var _ = require('lodash');
 var repo = require('../modules/repository.js');
 
+// Todo controller. main todo sample controller
+// =========================================================================
+
 module.exports = function (app, router) {
 
     var route = '/todos';
@@ -43,7 +46,7 @@ module.exports = function (app, router) {
             var result = new ResourceCollection();
             var pagesize = app.get('pagesize');
             result.odataCollection(req, items, pagesize);
-            
+
             result.addLink('self', "/api/v1/todo");
 
             res.json(result);
@@ -68,12 +71,12 @@ module.exports = function (app, router) {
                 res.badRequest('you must specify a valid body');
             }
             else {
-               
+
                 var newItem = repo.addTodo(req.body.text);
                 var todo = new Todo(newItem.id, newItem.text);
                 var location = "/api/v1/todo/" + newItem.id.toString();
                 todo.addLink('self', location);
-                
+
                 res.created(todo, location);
             }
 
@@ -101,7 +104,7 @@ module.exports = function (app, router) {
             var id = parseInt(req.params.id);
             var match = repo.getTodoById(id);
             var todo = new Todo(id, match.text);
-            
+
             if (todo) {
                 var location = "/api/v1/todo/" + id.toString();
                 todo.addLink('self', location);
@@ -133,13 +136,13 @@ module.exports = function (app, router) {
                 res.badRequest('you must specify a valid body');
             }
             else {
-                
-                 var id = parseInt(req.params.id);
+
+                var id = parseInt(req.params.id);
                 //echo the object back
                 var todo = new Todo(id, req.body.text);
                 var location = "/api/v1/todo/" + id.toString();
                 todo.addLink('self', location);
-                    
+
                 repo.updateTodo(todo);
 
                 res.ok(todo);
@@ -155,9 +158,9 @@ module.exports = function (app, router) {
     * HTTP/1.1 200 OK
     */
         .delete(function (req, res) {
-            
+
             var id = parseInt(req.params.id);
-            
+
             repo.deleteTodoById(id);
             res.ok();
         });

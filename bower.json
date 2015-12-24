@@ -9,6 +9,7 @@
     "angular-route": "latest",
     "angular-local-storage": "latest",
     "angular-cookies": "latest",
+     "lodash": "latest",
     "socket.io-client": "~1.3.7"
   }
 }

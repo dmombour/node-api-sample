@@ -3,6 +3,10 @@ var _ = require('lodash');
 var users = require('./repository-users.js');
 var todos = require('./repository-todos.js');
 
+// 
+// In memory simple repository to represent a database data model
+// =========================================================================
+
 module.exports = {
 
     getUsers: function () {
@@ -11,9 +15,9 @@ module.exports = {
     getUserById: function (id) {
 
         if (id) {
-            
+
             var match = _.find(users, function (u) {
-    
+
                 return (u.email.trim().toLowerCase() == id.trim().toLowerCase() || u.username.trim().toLowerCase() == id.trim().toLowerCase());
             });
 
@@ -24,13 +28,13 @@ module.exports = {
         users.push(item);
         return item;
     },
-     updateUser: function (item) {
-        
-        var index = _.findIndex(users, function(user) {
+    updateUser: function (item) {
+
+        var index = _.findIndex(users, function (user) {
             return user.id == item.id;
-            });
-            
-        if (index > 1){
+        });
+
+        if (index > 1) {
             users[index] = item;
         }
 
@@ -43,16 +47,16 @@ module.exports = {
         });
 
     },
-    
+
     getTodos: function () {
         return todos;
     },
     getTodoById: function (id) {
 
         if (id) {
-            
+
             var match = _.find(todos, function (item) {
-    
+
                 return (item.id == id);
             });
 
@@ -60,21 +64,21 @@ module.exports = {
         }
     },
     addTodo: function (text) {
-        
+
         var last = _.last(todos);
         var newId = last.id + 1;
-        
+
         var todo = { id: newId, text: text };
         todos.push(todo);
         return todo;
     },
     updateTodo: function (item) {
-        
-        var index = _.findIndex(todos, function(todo) {
+
+        var index = _.findIndex(todos, function (todo) {
             return todo.id == item.id;
-            });
-            
-        if (index > 1){
+        });
+
+        if (index >= 0) {
             todos[index] = item;
         }
 

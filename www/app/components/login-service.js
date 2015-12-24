@@ -1,14 +1,16 @@
 'use strict';
 appServices.factory('loginService', ['$http', 'localStorageService', function ($http, lsSvc) {
 
+    var url = '/api/v1/auth/token';
+    
     return {
         get: function () {
-            return $http.get('/api/v1/token');
+            return $http.get(url);
         },
         login: function (data) {
             return $http({
                 method: 'POST',
-                url: '/api/v1/token',
+                url: url,
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 transformRequest: function (obj) {
                     var str = [];
@@ -30,12 +32,6 @@ appServices.factory('loginService', ['$http', 'localStorageService', function ($
                     lsSvc.set('token', null);
                     $http.defaults.headers.common['Authorization'] = '';
                 });
-        },
-        getById: function (id) {
-            return $http.get('/api/v1/todos/', id);
-        },
-        delete: function (id) {
-            return $http.delete('/api/v1/todos/' + id);
         },
         setAccessToken: function (token) {
             lsSvc.set('token', token);
