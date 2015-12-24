@@ -1,7 +1,6 @@
 "use strict";
 // BASE SETUP
 // =============================================================================
-// call the packages we need
 var express = require('express');           // call express
 var compression = require('compression')    // express compression
 var app = express();                        // define our app using express
@@ -10,37 +9,36 @@ var morgan = require('morgan');             // console logger
 var fs = require('fs');                     // file system
 var jwt = require('jsonwebtoken');          // used to create, sign, and verify tokens
 var config = require('./config/config');    // our config file
-var passport = require('passport');
-var flash    = require('connect-flash');
+var passport = require('passport');         // auth library
+var flash    = require('connect-flash');    // needed for passport
 var cookieParser = require('cookie-parser');// cookies needed for passport
 var session = require('express-session');   // session support needed for passport
 var port = process.env.PORT || 8082;        // set our port
-//var favicon = require('serve-favicon');
+//var favicon = require('serve-favicon');   // change the favicon
 
-// configuration variables
-app.set('superSecret', config.secret); // secret variable
+// GLOBAL APP VARIABLES
+// =============================================================================
+app.set('superSecret', config.secret);
 app.set('trustedservers', config.trustedservers);
 app.set('openroutes', config.openroutes);
 app.set('pagesize', config.pagesize);
 
-// set up our express application
+// EXPRESS SETUP - web server
+// =============================================================================
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(morgan('dev'));     // use morgan to log requests to the console
-app.use(cookieParser());    // read cookies (needed for auth)
-
-// setup express to server static content
-app.use(compression())
-app.use(express.static('www'));
-app.set('views', __dirname  + '/www');
+app.use(morgan('dev'));                 // use morgan to log requests to the console
+app.use(cookieParser());                // read cookies (needed for auth)
+app.use(compression());                 // compression = good
+app.use(express.static('www'));         // setup express to server static content
+app.set('views', __dirname  + '/www');  // change my default dir to www instead of views
 //app.use(favicon(__dirname + '/www/assets/favicon.ico'));
-
 app.set('view engine', 'ejs'); // set up ejs for templating
 
-// required for passport
+// PASSPORT SETUP - the auth library
+// =============================================================================
 require('./app/modules/passport.js')(passport); // pass passport for configuration
-app.use(session({ secret: 'ilovescotchscotchyscotchscotch', resave: true,
-    saveUninitialized: true })); // session secret
+app.use(session({ secret: 'ilovescotchscotchyscotchscotch', resave: true, saveUninitialized: true })); // session secret
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
@@ -49,7 +47,6 @@ app.use(flash()); // use connect-flash for flash messages stored in session
 // ROUTES FOR OUR API
 // =============================================================================
 var router = express.Router();              // get an instance of the express Router
-
 //Load controllers dynamically
 /*
 fs.readdirSync('./app/controllers').forEach(function(file) {
@@ -58,10 +55,12 @@ fs.readdirSync('./app/controllers').forEach(function(file) {
     require('./app/controllers/' + name)(app, router);    
 });*/
 
-var repo = require('./app/modules/repository.js');                   
-require('./app/controllers/authenticationController')(app, router, jwt);
-require('./app/controllers/todoController')(app, router); 
+// modules
+var repo = require('./app/modules/repository.js');   
 require('./app/modules/passport-routes.js')(app, passport, jwt); // load our routes and pass in our app and fully configured passport
+// controllers
+require('./app/controllers/auth.js')(app, router, jwt);
+require('./app/controllers/todo.js')(app, router); 
 
 
 // middleware to use for all requests
@@ -90,18 +89,14 @@ express.response.forbidden = function(message) {
     return this.status(403).send(message);
 };
 
+// REGISTER OUR ROUTES
 // ROUTES FOR OUR API LOCATED IN /CONTROLLERS
 // =============================================================================
-
-// REGISTER OUR ROUTES -------------------------------
-// all of our routes will be prefixed with /api
-app.use('/api/v1', router);
-
+app.use('/api/v1', router);         // all of our routes will be prefixed with /api
 // test route to make sure everything is working (accessed at GET http://localhost:8082/api/v1)
 router.get('/', function (req, res) {
     res.json({ message: 'success! welcome to our api!' });
 });
-
 
 // START THE SERVER
 // =============================================================================

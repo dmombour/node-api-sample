@@ -4,6 +4,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var TwitterStrategy = require('passport-twitter').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var LinkedInStrategy = require('passport-linkedin').Strategy;
 var _ = require('lodash');
 var repo = require('./repository.js'); 
 
@@ -273,65 +274,116 @@ module.exports = function (passport) {
 
                 // check if the user is already logged in
                 if (!req.user) {
+                    //TODO: twitter doesn't supply email
 
-                    User.findOne({ 'twitter.id': profile.id }, function (err, user) {
-                        if (err)
-                            return done(err);
+                    var userId = _.first(_.pluck(profile.emails, 'value'));
+                    var user = repo.getUserById(userId);
+                    if (user) {
+                        return done(null, user); // user found, return that user                        
+                    }
+                    else {
+                        return done('no user matched in repo');
+                    }
 
-                        if (user) {
-                            // if there is a user id already but no token (user was linked at one point and then removed)
-                            if (!user.twitter.token) {
-                                user.twitter.token = token;
-                                user.twitter.username = profile.username;
-                                user.twitter.displayName = profile.displayName;
-
-                                user.save(function (err) {
-                                    if (err)
-                                        return done(err);
-
-                                    return done(null, user);
-                                });
-                            }
-
-                            return done(null, user); // user found, return that user
-                        } else {
-                            // if there is no user, create them
-                            var newUser = new User();
-
-                            newUser.twitter.id = profile.id;
-                            newUser.twitter.token = token;
-                            newUser.twitter.username = profile.username;
-                            newUser.twitter.displayName = profile.displayName;
-
-                            newUser.save(function (err) {
-                                if (err)
-                                    return done(err);
-
-                                return done(null, newUser);
-                            });
-                        }
-                    });
+                    /*                    User.findOne({ 'twitter.id': profile.id }, function (err, user) {
+                                            if (err)
+                                                return done(err);
+                    
+                                            if (user) {
+                                                // if there is a user id already but no token (user was linked at one point and then removed)
+                                                if (!user.twitter.token) {
+                                                    user.twitter.token = token;
+                                                    user.twitter.username = profile.username;
+                                                    user.twitter.displayName = profile.displayName;
+                    
+                                                    user.save(function (err) {
+                                                        if (err)
+                                                            return done(err);
+                    
+                                                        return done(null, user);
+                                                    });
+                                                }
+                    
+                                                return done(null, user); // user found, return that user
+                                            } else {
+                                                // if there is no user, create them
+                                                var newUser = new User();
+                    
+                                                newUser.twitter.id = profile.id;
+                                                newUser.twitter.token = token;
+                                                newUser.twitter.username = profile.username;
+                                                newUser.twitter.displayName = profile.displayName;
+                    
+                                                newUser.save(function (err) {
+                                                    if (err)
+                                                        return done(err);
+                    
+                                                    return done(null, newUser);
+                                                });
+                                            }
+                                        });*/
 
                 } else {
                     // user already exists and is logged in, we have to link accounts
-                    var user = req.user; // pull the user out of the session
-
-                    user.twitter.id = profile.id;
-                    user.twitter.token = token;
-                    user.twitter.username = profile.username;
-                    user.twitter.displayName = profile.displayName;
-
-                    user.save(function (err) {
-                        if (err)
-                            return done(err);
-
-                        return done(null, user);
-                    });
+                    var userId = _.first(_.pluck(profile.emails, 'value'));
+                    var user = repo.getUserById(userId);
+                    if (user) {
+                        return done(null, user); // user found, return that user                        
+                    }
+                    else {
+                        return done('no user matched in repo');
+                    }
+                    /* var user = req.user; // pull the user out of the session
+ 
+                     user.twitter.id = profile.id;
+                     user.twitter.token = token;
+                     user.twitter.username = profile.username;
+                     user.twitter.displayName = profile.displayName;
+ 
+                     user.save(function (err) {
+                         if (err)
+                             return done(err);
+ 
+                         return done(null, user);
+                     });*/
                 }
 
             });
 
         }));
+
+    // =========================================================================
+    // LINKEDIN ==================================================================
+    // =========================================================================
+    passport.use(new LinkedInStrategy({
+        consumerKey: configAuth.linkedinAuth.clientID,
+        consumerSecret: configAuth.linkedinAuth.clientSecret,
+        callbackURL: configAuth.linkedinAuth.callbackURL
+    },
+        function (token, tokenSecret, profile, done) {
+            // asynchronous verification, for effect...
+            process.nextTick(function () {
+                // To keep the example simple, the user's LinkedIn profile is returned to
+                // represent the logged-in user.  In a typical application, you would want
+                // to associate the LinkedIn account with a user record in your database,
+                // and return that user instead.
+                // find matching user
+                var userId = _.first(_.pluck(profile.emails, 'value'));
+
+                var user = repo.getUserById(userId);
+                if (user) {
+                    return done(null, user); // user found, return that user                        
+                }
+                else {
+                    return done('no user matched in repo');
+                }
+
+                //return done(null, profile);
+            });
+        }
+        ));
+
+
 
     // =========================================================================
     // GOOGLE ==================================================================
@@ -352,47 +404,68 @@ module.exports = function (passport) {
                 // check if the user is already logged in
                 if (!req.user) {
 
-                    User.findOne({ 'google.id': profile.id }, function (err, user) {
-                        if (err)
-                            return done(err);
+                    // find matching user
+                    var userId = _.first(_.pluck(profile.emails, 'value'));
 
-                        if (user) {
-
-                            // if there is a user id already but no token (user was linked at one point and then removed)
-                            if (!user.google.token) {
-                                user.google.token = token;
-                                user.google.name = profile.displayName;
-                                user.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
-                                user.save(function (err) {
-                                    if (err)
-                                        return done(err);
-
-                                    return done(null, user);
-                                });
-                            }
-
-                            return done(null, user);
-                        } else {
-                            var newUser = new User();
-
-                            newUser.google.id = profile.id;
-                            newUser.google.token = token;
-                            newUser.google.name = profile.displayName;
-                            newUser.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
-
-                            newUser.save(function (err) {
-                                if (err)
-                                    return done(err);
-
-                                return done(null, newUser);
-                            });
-                        }
-                    });
+                    var user = repo.getUserById(userId);
+                    if (user) {
+                        return done(null, user); // user found, return that user                        
+                    }
+                    else {
+                        return done('no user matched in repo');
+                    }
+                    
+                    /*                    User.findOne({ 'google.id': profile.id }, function (err, user) {
+                                            if (err)
+                                                return done(err);
+                    
+                                            if (user) {
+                    
+                                                // if there is a user id already but no token (user was linked at one point and then removed)
+                                                if (!user.google.token) {
+                                                    user.google.token = token;
+                                                    user.google.name = profile.displayName;
+                                                    user.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
+                    
+                                                    user.save(function (err) {
+                                                        if (err)
+                                                            return done(err);
+                    
+                                                        return done(null, user);
+                                                    });
+                                                }
+                    
+                                                return done(null, user);
+                                            } else {
+                                                var newUser = new User();
+                    
+                                                newUser.google.id = profile.id;
+                                                newUser.google.token = token;
+                                                newUser.google.name = profile.displayName;
+                                                newUser.google.email = (profile.emails[0].value || '').toLowerCase(); // pull the first email
+                    
+                                                newUser.save(function (err) {
+                                                    if (err)
+                                                        return done(err);
+                    
+                                                    return done(null, newUser);
+                                                });
+                                            }
+                                        });*/
 
                 } else {
                     // user already exists and is logged in, we have to link accounts
-                    var user = req.user; // pull the user out of the session
+                    // find matching user
+                    var userId = _.first(_.pluck(profile.emails, 'value'));
+
+                    var user = repo.getUserById(userId);
+                    if (user) {
+                        return done(null, user); // user found, return that user                        
+                    }
+                    else {
+                        return done('no user matched in repo');
+                    }
+                    /*var user = req.user; // pull the user out of the session
 
                     user.google.id = profile.id;
                     user.google.token = token;
@@ -404,7 +477,7 @@ module.exports = function (passport) {
                             return done(err);
 
                         return done(null, user);
-                    });
+                    });*/
 
                 }
 

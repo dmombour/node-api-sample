@@ -1,6 +1,6 @@
 "use strict";
 var Resource = require('../models/resource.js');
-var ResourceCollection = require('../models/resourcecollection.js');
+var ResourceCollection = require('../models/resource-collection.js');
 var Todo = require('../models/todo.js');
 var _ = require('lodash');
 var repo = require('../modules/repository.js');

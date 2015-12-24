@@ -52,6 +52,39 @@ module.exports = function (app, passport, jwt) {
         failureFlash: true // allow flash messages
     }));
 
+
+     // linkedin -------------------------------
+
+    // send to facebook to do the authentication
+    app.get('/auth/linkedin', passport.authenticate('linkedin', { session: false, scope: ['r_basicprofile', 'r_emailaddress'] }));
+
+    // handle the callback after facebook has authenticated the user
+    app.get('/auth/linkedin/callback',
+        passport.authenticate('linkedin', { session: false, failureRedirect: '/login' }),
+    
+        // on succes
+        function (req, res) {
+            // return the token or you would wish otherwise give eg. a succes message
+            //res.render('json', { data: JSON.stringify(req.user.access_token) });
+            // ok. we have our user. we need to create a jwt token and pass via query string.
+            var token = jwt.sign(req.user, app.get('superSecret'), {
+                expiresIn: 86400 // expires in 24 hours
+            });
+            res.redirect('/#/login/' + token);
+        },
+    
+        // on error; likely to be something token invalid or already used token,
+        // these errors occur when the user logs in twice with the same token
+        function (err, req, res, next) {
+            // You could put your own behavior in here, fx: you could force auth again...
+            // res.redirect('/auth/linkedin/');
+            if (err) {
+                res.status(400);
+                res.render('error', { message: err.message });
+            }
+        });
+
+
     // facebook -------------------------------
 
     // send to facebook to do the authentication
@@ -81,46 +114,45 @@ module.exports = function (app, passport, jwt) {
                 res.status(400);
                 res.render('error', { message: err.message });
             }
-        }
-
-        );
-
-    // handle the callback after facebook has authenticated the user
-    /*    app.get('/auth/facebook/callback',
-            passport.authenticate('facebook', {
-                successRedirect: '/profile',
-                failureRedirect: '/'
-            }));*/
-
-    /*app.get('/auth/facebook/callback', function (req, res, next) {
-        passport.authenticate('facebook', function (err, user, info) {
-            if (err) { return next(err); }
-            if (!user) { return res.redirect('/login'); }
-            req.logIn(user, function (err) {
-                if (err) { return next(err); }
-                
-                // ok. we have our user. we need to create a jwt token and pass via query string.
-                var token = jwt.sign(user, app.get('superSecret'), {
-                    expiresIn: 86400 // expires in 24 hours
-                });
-
-                return res.redirect('#/login?access_token=' + token);
-
-            });
-        })(req, res, next);
-    });*/
+        });
 
     // twitter --------------------------------
 
     // send to twitter to do the authentication
-    app.get('/auth/twitter', passport.authenticate('twitter', { scope: 'email' }));
+    app.get('/auth/twitter', passport.authenticate('twitter', { scope: ['email'] }));
 
     // handle the callback after twitter has authenticated the user
+    // handle the callback after facebook has authenticated the user
     app.get('/auth/twitter/callback',
-        passport.authenticate('twitter', {
-            successRedirect: '/profile',
-            failureRedirect: '/'
-        }));
+        passport.authenticate('twitter', { session: false, failureRedirect: '/login' }),
+    
+        // on succes
+        function (req, res) {
+            // return the token or you would wish otherwise give eg. a succes message
+            //res.render('json', { data: JSON.stringify(req.user.access_token) });
+            // ok. we have our user. we need to create a jwt token and pass via query string.
+            var token = jwt.sign(req.user, app.get('superSecret'), {
+                expiresIn: 86400 // expires in 24 hours
+            });
+            res.redirect('/#/login/' + token);
+        },
+    
+        // on error; likely to be something FacebookTokenError token invalid or already used token,
+        // these errors occur when the user logs in twice with the same token
+        function (err, req, res, next) {
+            // You could put your own behavior in here, fx: you could force auth again...
+            // res.redirect('/auth/facebook/');
+            if (err) {
+                res.status(400);
+                res.render('error', { message: err.message });
+            }
+        });
+        
+    /* app.get('/auth/twitter/callback',
+         passport.authenticate('twitter', {
+             successRedirect: '/profile',
+             failureRedirect: '/'
+         }));*/
 
 
     // google ---------------------------------
@@ -128,12 +160,39 @@ module.exports = function (app, passport, jwt) {
     // send to google to do the authentication
     app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-    // the callback after google has authenticated the user
+    // handle the callback after google has authenticated the user
     app.get('/auth/google/callback',
-        passport.authenticate('google', {
-            successRedirect: '/profile',
-            failureRedirect: '/'
-        }));
+        passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+    
+        // on succes
+        function (req, res) {
+            // return the token or you would wish otherwise give eg. a succes message
+            //res.render('json', { data: JSON.stringify(req.user.access_token) });
+            // ok. we have our user. we need to create a jwt token and pass via query string.
+            var token = jwt.sign(req.user, app.get('superSecret'), {
+                expiresIn: 86400 // expires in 24 hours
+            });
+            res.redirect('/#/login/' + token);
+        },
+    
+        // on error; likely to be something FacebookTokenError token invalid or already used token,
+        // these errors occur when the user logs in twice with the same token
+        function (err, req, res, next) {
+            // You could put your own behavior in here, fx: you could force auth again...
+            // res.redirect('/auth/google/');
+            if (err) {
+                res.status(400);
+                res.render('error', { message: err.message });
+            }
+        });
+
+
+    // the callback after google has authenticated the user
+    /*    app.get('/auth/google/callback',
+            passport.authenticate('google', {
+                successRedirect: '/profile',
+                failureRedirect: '/'
+            }));*/
 
     // =============================================================================
     // AUTHORIZE (ALREADY LOGGED IN / CONNECTING OTHER SOCIAL ACCOUNT) =============

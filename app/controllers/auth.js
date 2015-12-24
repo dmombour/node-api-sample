@@ -1,9 +1,7 @@
 "use strict";
-/// <reference path="../../server.js"/>
-/// <reference path="../models/user.js"/>
 var _ = require('lodash');
 var User = require('../models/user.js');
-var repo = require('../modules/repository.js'); 
+var repo = require('../modules/repository.js');
 
 module.exports = function (app, router, jwt) {
 
@@ -14,15 +12,11 @@ module.exports = function (app, router, jwt) {
         var token = req.query.token || req.headers['authorization'];        
         // decode token
         if (token) {
-
-            token = token.replace("Bearer ", "");
-        
+            token = token.replace("Bearer ", "");        
             // verifies secret and checks exp
             jwt.verify(token, app.get('superSecret'), function (err, decoded) {
                 if (err) {
-
                     return res.unauthorized('unauthorized. Failed to authenticate token. please login');
-
                 } else {
                     // if everything is good, save to request for use in other routes
                     req.decoded = decoded;
@@ -32,9 +26,7 @@ module.exports = function (app, router, jwt) {
         } else {
             // if there is no token... is this an insecure URL?
             var openroutes = app.get('openroutes');
-            var reqUrl = req.url;
-            console.log('auth:route', reqUrl);  
-            
+            var reqUrl = req.url;      
             //search for open insecure routes
             var match = _.find(openroutes, function (url) {
                 return (reqUrl.toString().indexOf(url.toString()) != -1);
@@ -53,11 +45,40 @@ module.exports = function (app, router, jwt) {
         }
     });
 
-    router.route('/token')
 
+    // routes
+    router.route('/auth/token')
+
+/**
+* @api {get} /auth/token Get
+* @apiGroup Authentication
+*
+* @apiSuccessExample Success-Response:
+* HTTP/1.1 200 OK
+*{
+*  "_links": {
+*    "self": "/api/v1/auth/token"
+*  },
+*  "items": [
+*    {
+*      "_links": {
+*        "self": "/api/v1/todos/0"
+*      },
+*      "name": "item_0",
+*      "id": 0
+*    },
+*    {
+*      "_links": {
+*        "self": "/api/v1/todos/1"
+*      },
+*      "name": "item_1",
+*      "id": 1
+*    }
+*  ]
+*}
+*/
         .get(function (req, res) {
 
-            // return the decoded token if it exists
             var decoded = req.decoded;
             if (decoded) {
 
@@ -70,6 +91,36 @@ module.exports = function (app, router, jwt) {
             }
 
         })
+
+ /**
+* @api {post} /auth/token Create access token
+* @apiDescription Authenticating users is an essential element of a typical security model to confirm the identification of a user (or in some cases, a machine) that is trying to log on or access resources. 
+* 
+* There are 3 basic models used. Standard username & password identity flow used for known registered users of the system (grant_type=password). Next is used for machine to machine trust, these tokens can be used to represent a server or
+* they can be used to impersonate a user as well (grant_type=client_credentials). To impersonate or gain access to a user based token simply specify the uniqueid and optionally the user details.
+* 
+* x-www-formurlencoded
+* @apiParam {string} grant_type The type of grant. Either of these choices [password] = standard username & password flow. [client_credentials] = used for server to server connections.
+* @apiParam {string} username The username. REQUIRED with grant_type=password.
+* @apiParam {string} password The password. REQUIRED with grant_type=password.
+* @apiParam {string} client_id The client_id. REQUIRED with grant_type=client_credentials.
+* @apiParam {string} client_secret The client_secret. REQUIRED with grant_type=client_credentials.
+* @apiParam {string} uniqueid The unqiue string (Example - email address, username, phone numbers, User ID, UID etc...) from your user management or identity system. OPTIONAL with grant_type=client_credentials.
+* @apiParam {string} firstname User's first name. OPTIONAL with grant_type=client_credentials.
+* @apiParam {string} lastname User's last name. OPTIONAL with grant_type=client_credentials.
+* @apiParam {string} pictureurl URL of user's avatar or profile picture. OPTIONAL with grant_type=client_credentials.
+* @apiGroup Authentication
+*
+* @apiSuccessExample Success-Response:
+* HTTP/1.1 200 OK
+* {
+*   "token_type": "bearer",
+*   "expires_in": 5183999,
+*   "access_token": "eyJ0eXAiOiJKV.....",
+*   "refresh_token": "none",
+*   "scope": "read write"
+* }
+*/
 
         .post(function (req, res) {
 
@@ -142,8 +193,8 @@ module.exports = function (app, router, jwt) {
                             console.log('auth:client_credentials flow... email specified. searching for user:', req.body.email);   
                             
                             //find the user by email
-                             var user = repo.getUserById(uname);                  
-                             if (user != undefined) {
+                            var user = repo.getUserById(uname);
+                            if (user != undefined) {
 
                                 console.log('auth:client_credentials flow. user found', user); 
                                 
@@ -197,7 +248,5 @@ module.exports = function (app, router, jwt) {
                     res.send('Unknown grant_type');
                     break;
             }
-            
         });
-
 }

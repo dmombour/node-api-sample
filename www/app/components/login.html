@@ -3,36 +3,36 @@
 
         <h1><span class="fa fa-sign-in"></span> Login</h1>
 
-            <div class="alert alert-danger" ng-show="message.length > 0">
-                {{ message }}
+        <div class="alert alert-danger" ng-show="message.length > 0">
+            {{ message }}
+        </div>
+
+        <!-- FORM -->
+        <form>
+            <div class="form-group">
+                <label>Email or Username</label>
+                <input type="text" class="form-control" name="username" ng-model="username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" class="form-control" name="password" ng-model="password">
             </div>
 
-                <!-- LOGIN FORM -->
-                <form>
-                    <div class="form-group">
-                        <label>Email or Username</label>
-                        <input type="text" class="form-control" name="username" ng-model="username">
-                    </div>
-                    <div class="form-group">
-                        <label>Password</label>
-                        <input type="password" class="form-control" name="password" ng-model="password">
-                    </div>
+            <button type="submit" class="btn btn-warning btn-lg" ng-click="login(username, password)">Login</button>
+        </form>
 
-                    <button type="submit" class="btn btn-warning btn-lg" ng-click="login(username, password)">Login</button>
-                </form>
+        <hr>
 
-                <hr>
+        <p>Need an account? <a href="/signup">Signup</a></p>
 
-                <p>Need an account? <a href="/signup">Signup</a></p>
+        <br />
 
-                <br />
-
-                <div class="text-center">
-                    <a href="/auth/facebook" class="btn btn-primary"><span class="fa fa-facebook"></span> Facebook</a>
-                    <a href="/auth/twitter" class="btn btn-info"><span class="fa fa-twitter"></span> Twitter</a>
-                    <a href="/auth/google" class="btn btn-danger"><span class="fa fa-google-plus"></span> Google+</a>
-                </div>
-
+        <div class="text-center">
+            <a href="/auth/facebook" class="btn btn-primary"><span class="fa fa-facebook"></span> Facebook</a>
+            <a href="/auth/twitter" class="btn btn-info"><span class="fa fa-twitter"></span> Twitter</a>
+            <a href="/auth/google" class="btn btn-danger"><span class="fa fa-google-plus"></span> Google+</a>
+            <a href="/auth/linkedin" class="btn btn-success"><span class="fa fa-linkedin"></span> LinkedIn</a>
+        </div>
 
     </div>
 </div>

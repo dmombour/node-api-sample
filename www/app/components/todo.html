@@ -1,43 +1,47 @@
 <div class="container">
+    <div class="col-sm-6 col-sm-offset-3">
 
-		<!-- HEADER AND TODO COUNT -->
-		<div class="jumbotron text-center">
-			<h1>Todo application.. you have <span class="label label-info">{{ todos.length }}</span> todos </h1>
-		</div>
+        <h1><span class="fa fa-sticky-note"></span> Todo... you have <span class="label label-info">{{ todos.length }}</span> todos </h1>
 
-		<!-- LIST -->
-		<div id="todo-list" class="row">
-			<div class="col-sm-4 col-sm-offset-4">			
+        <!-- LIST -->
+        <div id="todo-list" class="row">
+            <div class="col-sm-6">
 
-				<!-- LOOP OVER THE todos IN $scope.todos -->
-				<div class="checkbox" ng-repeat="todo in todos">
-					<label>
-                        <a href="#/todo/{{ todo.id }}"><button type="submit" class="btn btn-primary btn-lg"">Edit</button></a>
-                        <button type="submit" class="btn btn-primary btn-lg" ng-click="deleteTodo(todo.id)">Delete</button>                       
-                         {{ todo.id }} : {{ todo.text }}
-					</label>
-				</div>
+                <p class="text-center" ng-show="loading">
+                    <span class="fa fa-spinner fa-spin fa-3x"></span>
+                </p>
 
-				<p class="text-center" ng-show="loading">
-					<span class="fa fa-spinner fa-spin fa-3x"></span>
-				</p>
+                <!-- LOOP OVER THE todos IN $scope.todos -->
+                <div class="checkbox" ng-repeat="todo in todos">
 
-			</div>
-		</div>
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <label>{{ todo.id }} : {{ todo.text }}</label>
+                        </div>
+                        <div class="col-sm-2"><a href="#/todo/{{ todo.id }}"><button type="submit" class="btn btn-primary"">Edit</button></a></div>
+                        <div class="col-sm-2">
+                            <button type="submit" class="btn btn-primary" ng-click="deleteTodo(todo.id)">Delete</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- FORM TO CREATE -->
+                <div id="sample-form" class="row">
+                    <form>
+                        <div class="col-sm-8">
+                            <div class="form-group">
+                                <!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
+                                <input type="text" class="form-control input-lg text-center" placeholder="Add your todo here.." ng-model="formData.text">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-primary" ng-click="createTodo()">Add</button>
+                        </div>
 
-		<!-- FORM TO CREATE -->
-		<div id="sample-form" class="row">
-			<div class="col-sm-8 col-sm-offset-2 text-center">
-				<form>
-					<div class="form-group">
-						<!-- BIND THIS VALUE TO formData.text IN ANGULAR -->                        
-						<input type="text" class="form-control input-lg text-center" placeholder="Add your todo here.." ng-model="formData.text">
-					</div>
+                    </form>
+                </div>
 
-					<!-- WILL CREATE NEW TODO -> POST -->
-					<button type="submit" class="btn btn-primary btn-lg" ng-click="createTodo()">Add</button>
-				</form>
-			</div>
-		</div>
 
-	</div>
+            </div>
+        </div>
+    </div>
+</div>
