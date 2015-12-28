@@ -8,6 +8,12 @@ appControllers.controller('loginController', ['$scope', '$http', '$routeParams',
         $scope.password;
         $scope.access_token = $routeParams.access_token;
 
+        console.log('loginController: routeParams', $routeParams);
+
+        if ($routeParams.message) {
+            $scope.message = $routeParams.message;
+        }
+
         if ($scope.access_token) {
             console.log('loginController: we have a redirect token', $scope.access_token);
             loginSvc.setAccessToken($scope.access_token);

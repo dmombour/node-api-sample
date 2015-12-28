@@ -52,8 +52,8 @@ try {
 require('./app/modules/passport.js')(passport, configAuth); // pass passport for configuration
 app.use(session({ secret: 'ilovescotchscotchyscotchscotch', resave: true, saveUninitialized: true })); // session secret
 app.use(passport.initialize());
-app.use(passport.session()); // persistent login sessions
-app.use(flash()); // use connect-flash for flash messages stored in session
+//app.use(passport.session()); // persistent login sessions
+//app.use(flash()); // use connect-flash for flash messages stored in session
 
 
 // ROUTES FOR OUR API
