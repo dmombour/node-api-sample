@@ -2,6 +2,7 @@
 var _ = require('lodash');
 var users = require('./repository-users.js');
 var todos = require('./repository-todos.js');
+var User = require('../models/user.js');
 
 // 
 // In memory simple repository to represent a database data model
@@ -17,11 +18,21 @@ module.exports = {
         if (id) {
 
             var match = _.find(users, function (u) {
-
-                return (u.email.trim().toLowerCase() == id.trim().toLowerCase() || u.username.trim().toLowerCase() == id.trim().toLowerCase());
+                return (u.id == id || u.externalId == id || u.email.trim().toLowerCase() == id.trim().toLowerCase());
             });
 
-            return match;
+            if (match) {
+                var user = new User();
+                for (var prop in match) {
+                    if (match.hasOwnProperty(prop)) {
+                        user[prop] = match[prop];
+                    }
+                }
+                return user;
+            }
+            else {
+                return null;
+            }
         }
     },
     addUser: function (item) {

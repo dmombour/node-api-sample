@@ -1,7 +1,8 @@
 "use strict";
 var _ = require('lodash');
-var User = require('../models/user.js');
 var repo = require('../modules/repository.js');
+var User = require('../models/user.js');
+var Token = require('../models/token.js');
 
 // Auth controller. Used to protect resources in this application and obtain a bearer token
 // =========================================================================
@@ -24,7 +25,7 @@ module.exports = function (app, router, jwt, configAuth) {
                     return res.unauthorized('unauthorized. Failed to authenticate token. please login. The error was:' + err.message);
                 } else {
                     // if everything is good, save to request for use in other routes
-                    req.decoded = decoded;
+                    req.userToken = decoded;
                     next();
                 }
             });
@@ -60,34 +61,21 @@ module.exports = function (app, router, jwt, configAuth) {
     * @apiSuccessExample Success-Response:
     * HTTP/1.1 200 OK
     *{
-    *  "_links": {
-    *    "self": "/api/v1/auth/token"
-    *  },
-    *  "items": [
-    *    {
-    *      "_links": {
-    *        "self": "/api/v1/todos/0"
-    *      },
-    *      "name": "item_0",
-    *      "id": 0
-    *    },
-    *    {
-    *      "_links": {
-    *        "self": "/api/v1/todos/1"
-    *      },
-    *      "name": "item_1",
-    *      "id": 1
-    *    }
-    *  ]
+    *  "id": "",
+    *  "name": "Darren Darren",
+    *  "type": "User",
+    *  "email": "dmombour@gmail.com",
+    *  "authProvider": "node-api-sample",
+    *  "iat": 1451271947,
+    *  "exp": 1451358347   
     *}
     */
         .get(function (req, res) {
 
-            var decoded = req.decoded;
-            if (decoded) {
+            var userToken = req.userToken;
+            if (userToken) {
 
-                console.log(decoded);
-                res.json(decoded);
+                res.json(userToken);
 
             }
             else {
@@ -128,8 +116,6 @@ module.exports = function (app, router, jwt, configAuth) {
 
         .post(function (req, res) {
 
-            var trustedservers = configAuth.trustedServers;
-
             switch (req.body.grant_type) {
                 case 'password':
 
@@ -138,9 +124,11 @@ module.exports = function (app, router, jwt, configAuth) {
 
                     console.log('auth:password flow for ' + uname);
 
-                    // find matching user
+                    // find matching user in the repository
                     var match = repo.getUserById(uname);
+                    // check password
                     if (match) {
+                        // todo: implement hash verification here
                         if (match.password.trim() != password) {
                             console.log('auth:password dont match');
                             match = null;
@@ -148,10 +136,13 @@ module.exports = function (app, router, jwt, configAuth) {
                     }
 
                     if (match != undefined) {
-                        console.log('auth:password flow... found', match);      
+                        console.log('auth:password flow... found', match);
+
+                        var userToken = match.toToken();
+                        userToken.authProvider = 'node-api-sample'; // our app                    
                         
                         // create a token
-                        var token = jwt.sign(match, superSecret, {
+                        var token = jwt.sign(userToken, superSecret, {
                             expiresIn: 86400 // expires in 24 hours
                         });    
                         
@@ -181,7 +172,7 @@ module.exports = function (app, router, jwt, configAuth) {
                     console.log('auth:client_credentials flow | client_id:' + client_id);
                     
                     //search for trusted servers
-                    var match = _.find(trustedservers, function (server) {
+                    var match = _.find(configAuth.trustedservers, function (server) {
                         return server.client_id == client_id && server.client_secret == client_secret;
                     });
 
@@ -191,33 +182,49 @@ module.exports = function (app, router, jwt, configAuth) {
                        
                         // In this flow there is the potential for this to actually be an impersonation context. 
                         // Check to see if we want to impersonate users.. and if so then do it.                            
-                        if (req.body.email != undefined) {
+                        if (req.body.uniqueid != undefined) {
 
-                            console.log('auth:client_credentials flow... email specified. searching for user:', req.body.email);   
-                            
+                            console.log('auth:client_credentials flow... email specified. searching for user:', req.body.email);
+                            var uniqueid = req.body.uniqueid;
                             //find the user by email
-                            var user = repo.getUserById(uname);
+                            var user = repo.getUserById(uniqueid);
                             if (user != undefined) {
 
-                                console.log('auth:client_credentials flow. user found', user); 
-                                
+                                console.log('auth:client_credentials flow. user found', user);
+
+                                var userToken = user.toToken();
+                                userToken.authProvider = 'node-api-sample'; // our app 
+                        
                                 //found the user... let's use this.
-                                token = jwt.sign(user, superSecret, {
+                                token = jwt.sign(userToken, superSecret, {
                                     expiresInMinutes: 1440 // expires in 24 hours                                    
                                 });
+
                             }
                             else {                                
 
-                                //no user found... lets create one
+                                // no user found... lets create one.. we need enough information
+                                // firstname, lastname and email are required
+                                if (req.body.firstname == undefined || req.body.lastname == undefined || req.body.email == undefined) {
+                                    return res.badRequest('uniqueid not recognized and not enough information to create a guest user. you must specify firstName | lastName | uniqueid | email.');
+                                }
+
                                 console.log('auth:client_credentials flow. NO user found. Create one');
-                                var newUser = User;
-                                newUser.firstName = req.body.firstName;
-                                newUser.lastName = req.body.lastName;
+                                var newUser = new User();
+                                newUser.id = req.body.uniqueid;
+                                newUser.firstName = req.body.firstname;
+                                newUser.lastName = req.body.lastname;
                                 newUser.email = req.body.email;
+                                newUser.pictureurl = req.body.pictureurl;
+                                
+                                repo.addUser(newUser);
+
+                                var userToken = newUser.toToken();
+                                userToken.authProvider = 'node-api-sample'; // our app 
 
                                 console.log('auth:client_credentials flow. no user found. created', newUser);
 
-                                token = jwt.sign(newUser, superSecret, {
+                                token = jwt.sign(userToken, superSecret, {
                                     expiresInMinutes: 1440 // expires in 24 hours                                    
                                 });
                             }
@@ -225,8 +232,10 @@ module.exports = function (app, router, jwt, configAuth) {
                         else {
                             
                             // here ... we are not a user.. we are just a server. 
-                            // give out a server token                        
-                            token = jwt.sign(match, superSecret, {
+                            // give out a server token    
+                             var serverToken = new Token(match.id, match.name, 'Server', '', 'node-api-sample');
+                                                
+                            token = jwt.sign(serverToken, superSecret, {
                                 expiresInMinutes: 1440 // expires in 24 hours                                    
                             });
                         }                           

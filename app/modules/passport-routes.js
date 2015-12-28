@@ -58,11 +58,11 @@ module.exports = function (app, passport, jwt, configAuth) {
      // linkedin -------------------------------
 
     // send to facebook to do the authentication
-    app.get('/auth/linkedin', passport.authenticate('linkedin', { session: false, scope: ['r_basicprofile', 'r_emailaddress'] }));
+    app.get('/auth/linkedin', passport.authenticate('linkedin', { session: false, scope: ['r_emailaddress', 'r_basicprofile'] }));
 
     // handle the callback after facebook has authenticated the user
     app.get('/auth/linkedin/callback',
-        passport.authenticate('linkedin', { session: false, failureRedirect: '/login' }),
+        passport.authenticate('linkedin', { session: false, failureRedirect: '/login', state: 'SOME STATE' }),
     
         // on succes
         function (req, res) {
@@ -90,7 +90,7 @@ module.exports = function (app, passport, jwt, configAuth) {
     // facebook -------------------------------
 
     // send to facebook to do the authentication
-    app.get('/auth/facebook', passport.authenticate('facebook', { session: false, scope: ['email'] }));
+    app.get('/auth/facebook', passport.authenticate('facebook', { session: false, scope: ['email', 'user_birthday', 'user_location'] }));
 
     // handle the callback after facebook has authenticated the user
     app.get('/auth/facebook/callback',
@@ -121,7 +121,7 @@ module.exports = function (app, passport, jwt, configAuth) {
     // twitter --------------------------------
 
     // send to twitter to do the authentication
-    app.get('/auth/twitter', passport.authenticate('twitter', { scope: ['email'] }));
+    app.get('/auth/twitter', passport.authenticate('twitter', { scope: [''] }));
 
     // handle the callback after twitter has authenticated the user
     // handle the callback after facebook has authenticated the user
@@ -139,11 +139,11 @@ module.exports = function (app, passport, jwt, configAuth) {
             res.redirect('/#/login/' + token);
         },
     
-        // on error; likely to be something FacebookTokenError token invalid or already used token,
+        // on error; likely to be something provider token invalid or already used token,
         // these errors occur when the user logs in twice with the same token
         function (err, req, res, next) {
             // You could put your own behavior in here, fx: you could force auth again...
-            // res.redirect('/auth/facebook/');
+            // res.redirect('/auth/twitter/');
             if (err) {
                 res.status(400);
                 res.render('error', { message: err.message });

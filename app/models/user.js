@@ -1,5 +1,29 @@
 "use strict";
-module.exports = {
+var Token = require('./token.js');
+
+function User(){
+
+   // Add object properties like this
+   this.id = '';
+   this.gender = '';
+   this.firstname = '';
+   this.lastname = '';
+   this.title = '';
+   this.email = '';
+   this.username = '';
+   this.password = '';
+   this.phone = '';   
+   this.externalId = '';   
+}
+
+// Add methods like this.  All Person objects will be able to invoke this
+User.prototype.toToken = function(){
+    return new Token(this.id, this.firstName + ' ' + this.lastName, 'User', this.email, 'unknown');
+};
+
+module.exports = User;
+
+/*module.exports = {
     "gender": "unknown",
     "name" : "",
     "firstname": "",
@@ -28,4 +52,4 @@ module.exports = {
         "medium": "",
         "thumbnail": ""
     }
-};
+};*/
