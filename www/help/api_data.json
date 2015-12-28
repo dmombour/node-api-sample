@@ -8,7 +8,7 @@
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "HTTP/1.1 200 OK\n{\n \"_links\": {\n   \"self\": \"/api/v1/auth/token\"\n },\n \"items\": [\n   {\n     \"_links\": {\n       \"self\": \"/api/v1/todos/0\"\n     },\n     \"name\": \"item_0\",\n     \"id\": 0\n   },\n   {\n     \"_links\": {\n       \"self\": \"/api/v1/todos/1\"\n     },\n     \"name\": \"item_1\",\n     \"id\": 1\n   }\n ]\n}",
+          "content": "HTTP/1.1 200 OK\n{\n \"id\": \"\",\n \"name\": \"Darren Darren\",\n \"type\": \"User\",\n \"email\": \"dmombour@gmail.com\",\n \"authProvider\": \"node-api-sample\",\n \"iat\": 1451271947,\n \"exp\": 1451358347   \n}",
           "type": "json"
         }
       ]

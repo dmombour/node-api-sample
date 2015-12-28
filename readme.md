@@ -24,26 +24,34 @@ or
 
 $ node server.js
 
+Visit
+
+http://yourserver:8082/help -> REST documentation
+
+http://yourserver:8082 -> angular test UI 
+
+http://yourserver:8082/api/v1/ -> REST api root
+
 
 # This sample application *attempts* to demonstrate the following
-- Oauth Authentication with JWT tokens.
+- Token based authentication with JWT tokens. Support standard users as well as server to server tokens = complete
     - grant_type = password. used for standard username & password authentication
-    - grant_type = client_credentials. used for server to server communcation. plus optional impersonation.
-- RESTful api /api/v1/todo w/ Authentication = complete
-- Documentation generation /help/ = incomplete (implement header template) 
+    - grant_type = client_credentials. used for server to server communcation. plus optional impersonation where by servers can request user based tokens in a simple single sign-on fashion
+- RESTful api sample /api/v1/todo with JWT Authentication = complete
 - Hypermedia following the HAL model via Resource and ResourceCollection wrapper classes. - http://stateless.co/hal_specification.html = complete
-- Partial OData implementation for server paging & filtering
+- OData implementation for REST server paging & filtering - incomplete
     - $top = complete
     - $skip = complete
     - $orderby = incomplete
     - $filter = incomplete
+- Documentation generation /help/ = complete 
+- Real-time events to complement REST interface (Socket.io) = complete
 - Angular JS application w/ secure RESTful api backend = incomplete (tidy up UI)
 - Social Auth integration
     - Facebook = complete
     - Google = complete
-    - Twitter = incomplete (twitter doesn't have email addresses?)
-    - LinkedIn = incomplete (needs testing)
-- Real-time events (Socket.io) = incomplete (not started)
+    - Twitter = complete
+    - LinkedIn = complete (needs testing)
 - TypeScript = incomplete (not started)
 
 Documentation Generation provided by http://apidocjs.com/

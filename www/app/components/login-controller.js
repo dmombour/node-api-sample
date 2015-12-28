@@ -20,18 +20,16 @@ appControllers.controller('loginController', ['$scope', '$http', '$routeParams',
             
             // now test if this is valid..
             // attempt a retreival of me.. if not valid then we will redirect
-                loginSvc.get()
-                    .success(function (data) {
-                        console.log('loginController:AUTHORIZED');
-                        
-                        $location.path('#/todo');
-                    })
-                    .error(function (data, status) {
-                        console.error('loginController:NOT-AUTHORIZED');
-                        loginSvc.setAccessToken(null);
-                        
-                        $location.path('#/login');
-                    });
+            loginSvc.get()
+                .success(function (data) {
+                    console.log('loginController:AUTHORIZED... navigate to main');
+                    $location.path('#/todo');
+                })
+                .error(function (data, status) {
+                    console.error('loginController:NOT-AUTHORIZED');
+                    loginSvc.setAccessToken(null);
+                    $location.path('#/login');
+                });
         }
 
         $scope.login = function (username, password) {
@@ -44,10 +42,13 @@ appControllers.controller('loginController', ['$scope', '$http', '$routeParams',
 
                     loginSvc.get()
                         .success(function (data) {
-                            console.log('loginController:AUTHORIZED');
+                            console.log('loginController:AUTHORIZED... navigate to main');
+                            $location.path('#/todo');
                         })
                         .error(function (data, status) {
                             console.error('loginController:NOT-AUTHORIZED');
+                            loginSvc.setAccessToken(null);
+                            $location.path('#/login');
                         });
 
                     console.log('loginController: success stored token', data);
