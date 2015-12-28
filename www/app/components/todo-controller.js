@@ -1,27 +1,48 @@
 'use strict';
-appControllers.controller('todoController', ['$scope', '$http', '$routeParams', '$location', 'socket', 'todoService',
-    function ($scope, $http, $routeParams, $location, socket, todoSvc) {
+appControllers.controller('todoController', ['$scope', '$http', '$routeParams', '$location', 'todoService',
+    function ($scope, $http, $routeParams, $location, todoSvc) {
+
+        console.log('todoController:ctor');
+
+        var self = this;
 
         $scope.formData = {};
         $scope.loading = true;
         $scope.selectedId = $routeParams.id;
         $scope.text;
-        $scope.todos;
-
-        socket.on('news', function (data) {
-            console.log('socket:', data);
-            socket.emit('my other event', { my: 'data' });
-        });
+        $scope.todos = {};
 
         console.log($routeParams.id);
+
+        self.addTodo = function (item) {
+            $scope.todos.items.push(item);
+        };
+
+        self.removeTodo = function (id) {
+            _.remove($scope.todos.items, function (item) {
+                return (item.id == id);
+            });
+        };
+
+        self.updateTodo = function (item) {
+            var index = _.findIndex($scope.todos.items, function (todo) {
+                return todo.id == item.id;
+            });
+
+            if (index >= 0) {
+                console.log('todoController.self.updateTodo:found item in index', index);
+                $scope.todos.items[index] = item;
+            }
+
+        };
         
         // GET =====================================================================
-		
+
         if ($scope.selectedId) {
 
             console.log('get by id', $scope.selectedId);
 
-            todoSvc.getById($scope.selectedId)
+            todoSvc.api.getById($scope.selectedId)
                 .success(function (data) {
                     console.log(data);
                     $scope.text = data.text;
@@ -32,7 +53,22 @@ appControllers.controller('todoController', ['$scope', '$http', '$routeParams', 
             // use the service to get all 
             $scope.loading = true;
 
-            todoSvc.get()
+            todoSvc.live.onTodoCreated(function (data) {
+                console.log('todoSvc.live.onTodoCreated:', data);
+                self.addTodo(data);
+            });
+
+            todoSvc.live.onTodoDeleted(function (id) {
+                console.log('todoSvc.live.onTodoDeleted:', id);
+                self.removeTodo(id);
+            });
+
+            todoSvc.live.onTodoUpdated(function (data) {
+                console.log('todoSvc.live.onTodoUpdated:', data);
+                self.updateTodo(data);
+            });
+
+            todoSvc.api.get()
                 .success(function (data) {
                     $scope.todos = data;
                     $scope.loading = false;
@@ -51,12 +87,11 @@ appControllers.controller('todoController', ['$scope', '$http', '$routeParams', 
                 $scope.loading = true;
 
                 // call the create function from our service (returns a promise object)
-                todoSvc.create($scope.formData)                
+                todoSvc.api.create($scope.formData)                
                 // if successful creation, update scope
                     .success(function (data) {
                         $scope.loading = false;
                         $scope.formData = {}; // clear the form so our user is ready to enter another
-                        $scope.todos.push(data);
                     });
             }
         };
@@ -66,25 +101,17 @@ appControllers.controller('todoController', ['$scope', '$http', '$routeParams', 
         $scope.deleteTodo = function (id) {
             $scope.loading = true;
 
-            todoSvc.delete(id)
+            todoSvc.api.delete(id)
             // if successful creation, call our get function to get all the new todos
                 .success(function (data) {
                     $scope.loading = false;
-                    _.remove($scope.todos, function (item) {
-                        return (item.id == id);
-                    });
-        
-                    /* _.remove($scope.todos, function (item) {
-                        return (item.id == id);
-                    });*/
-                    //$scope.todos = data; // assign our new list of todos
                 });
         };
         
         // SAVE ==================================================================
         $scope.saveTodo = function (text) {
             $scope.loading = true;
-            todoSvc.update($scope.selectedId, { text: text })
+            todoSvc.api.update($scope.selectedId, { text: text })
             // if successful creation, call our get function to get all the new todos
                 .success(function (data) {
                     $scope.loading = false;
@@ -102,7 +129,7 @@ appControllers.controller('todoController', ['$scope', '$http', '$routeParams', 
         $scope.next = function (qs) {
             $scope.loading = true;
 
-            todoSvc.get(qs)
+            todoSvc.api.get(qs)
                 .success(function (data) {
                     $scope.todos = data;
                     $scope.loading = false;

@@ -34,6 +34,16 @@ app.use(express.static('www'));         // setup express to server static conten
 app.set('views', __dirname  + '/www');  // change my default dir to www instead of views
 //app.use(favicon(__dirname + '/www/assets/favicon.ico'));
 app.set('view engine', 'ejs'); // set up ejs for templating
+app.disable('x-powered-by');
+
+app.use(function (req, res, next) {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "X-Requested-With");
+        res.header("Access-Control-Allow-Headers", "Content-Type");
+        res.header("Access-Control-Allow-Methods", "PUT, GET, POST, DELETE, OPTIONS");
+        next();
+    }
+);
 
 // PASSPORT SETUP - the auth library
 // =============================================================================
@@ -72,7 +82,8 @@ var repo = require('./app/modules/repository.js');
 require('./app/modules/passport-routes.js')(app, passport, jwt, configAuth); // load our routes and pass in our app and fully configured passport
 // controllers
 require('./app/controllers/auth.js')(app, router, jwt, configAuth);
-require('./app/controllers/todo.js')(app, router); 
+require('./app/controllers/todo.js')(app, router, io); 
+
 
 
 // middleware to use for all requests

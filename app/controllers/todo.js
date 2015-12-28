@@ -8,9 +8,11 @@ var repo = require('../modules/repository.js');
 // Todo controller. main todo sample controller
 // =========================================================================
 
-module.exports = function (app, router) {
+module.exports = function (app, router, io) {
 
     var route = '/todos';
+    var nsp = io.of(route);
+    
     router.route(route)
     /**
     * @api {get} /todos Get
@@ -78,9 +80,10 @@ module.exports = function (app, router) {
                 todo.addLink('self', location);
 
                 res.created(todo, location);
+                
+                // emit real-time event
+                nsp.emit('post', todo);
             }
-
-
         });
 
     router.route('/todos/:id')
@@ -146,6 +149,9 @@ module.exports = function (app, router) {
                 repo.updateTodo(todo);
 
                 res.ok(todo);
+                
+                // emit real-time event
+                nsp.emit('put', todo);
             }
         })
 
@@ -163,10 +169,8 @@ module.exports = function (app, router) {
 
             repo.deleteTodoById(id);
             res.ok();
+            
+            // emit real-time event
+            nsp.emit('delete', id);
         });
-
-
-
-
-
 }
