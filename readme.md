@@ -51,7 +51,7 @@ http://yourserver:8082/api/v1/ -> REST api root
     - Facebook = complete
     - Google = complete
     - Twitter = complete
-    - LinkedIn = complete (needs testing)
+    - LinkedIn = complete
 - TypeScript = incomplete (not started)
 
 Documentation Generation provided by http://apidocjs.com/
